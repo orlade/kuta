@@ -1,5 +1,7 @@
 # Kuta
 
+[![Build Status](https://travis-ci.org/orlade/kuta.svg?branch=master)](https://travis-ci.org/orlade/kuta)
+
 Kuta implements a variety of common data structures and algorithms "from scratch". When collections
 such as lists, stacks and hash maps (and even `Collection`s) are needed, they are implemented using 
 arrays rather than the convenient classes in `java.util`.
