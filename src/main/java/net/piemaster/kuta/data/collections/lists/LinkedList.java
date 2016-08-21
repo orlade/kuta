@@ -45,12 +45,9 @@ public class LinkedList<T> implements List<T> {
     public LinkedList() {
     }
 
-    public LinkedList(T... items) {
-        if (items == null) {
-            return;
-        }
-        for (T item : items) {
-            add(item);
+    public LinkedList(Collection<? extends T> items) {
+        if (items != null) {
+            addAll(items);
         }
     }
 
