@@ -1,4 +1,4 @@
-package net.piemaster.jad.data.collections.lists
+package net.piemaster.kuta.data.collections.lists
 
 import com.google.common.collect.testing.ListTestSuiteBuilder
 import com.google.common.collect.testing.TestStringListGenerator
