@@ -41,6 +41,7 @@ class BinarySearcherTest extends Specification {
 
         where:
         target | array
+        1      | null
         1      | [] as Integer[]
         1      | [0, 2] as Integer[]
         0      | [1, 2] as Integer[]

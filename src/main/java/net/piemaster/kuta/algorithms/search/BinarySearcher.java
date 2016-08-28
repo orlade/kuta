@@ -52,6 +52,9 @@ public class BinarySearcher<T extends Comparable> {
      * @return The index of the target element in the array, or -1 if it does not exist.
      */
     public int search(T[] array, T target) {
+        if (array == null) {
+            return -1;
+        }
         return search(array, target, 0, array.length);
     }
 
