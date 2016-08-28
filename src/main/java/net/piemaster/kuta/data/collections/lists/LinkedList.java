@@ -80,42 +80,46 @@ public class LinkedList<T> implements List<T> {
         iter.add(element);
     }
 
-    // NAIVE
     @Override
-    public boolean addAll(Collection<? extends T> c) {
-        java.util.ListIterator<T> iter = listIterator();
-        while (iter.hasNext()) {
-            iter.next();
-        }
-        boolean changed = false;
-        for (T item : c) {
-            iter.add(item);
-            changed = true;
-        }
-        return changed;
+    public boolean addAll(Collection<? extends T> items) {
+        return addAllAfter(getLastNode(), items);
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends T> c) {
+    public boolean addAll(int index, Collection<? extends T> items) {
         if (index < 0) {
             throw new IndexOutOfBoundsException("Cannot set outside list bounds");
         }
-        if (c == null) {
-            throw new NullPointerException("Must provide collection to add");
-        } else if (c.isEmpty()) {
+
+        Node previous = index == 0 ? null : getNodeAt(index - 1);
+        return addAllAfter(previous, items);
+    }
+
+    /**
+     * Adds a collection of items contiguously after a specified node.
+     *
+     * @param previous The node to add the collection items after. If null, inserts the items at the
+     *                 start.
+     * @param items    The items to add to new nodes.
+     * @return True if the list was modified, or false otherwise.
+     */
+    boolean addAllAfter(Node previous, Collection<? extends T> items) {
+        if (items == null) {
+            throw new NullPointerException("Collection of items to add must not be null");
+        } else if (items.isEmpty()) {
             return false;
         }
 
-        java.util.ListIterator<T> iter = listIterator();
-        while (iter.nextIndex() < index) {
-            if (!iter.hasNext()) {
-                throw new IndexOutOfBoundsException("Cannot set outside list bounds");
+        Node next = previous == null ? head : previous.getNext();
+        for (T item : items) {
+            Node newNode = new Node(item);
+            if (previous == null) {
+                head = newNode;
+            } else {
+                previous.setNext(newNode);
             }
-            iter.next();
-        }
-
-        for (T item : c) {
-            iter.add(item);
+            previous = newNode;
+            newNode.setNext(next);
         }
         return true;
     }
@@ -179,12 +183,15 @@ public class LinkedList<T> implements List<T> {
         return value;
     }
 
-    // NAIVE
     @Override
     public boolean removeAll(Collection<?> c) {
         boolean changed = false;
-        for (Object item : c) {
-            changed |= remove(item);
+        java.util.ListIterator<T> iter = listIterator();
+        while (iter.hasNext()) {
+            if (c.contains(iter.next())) {
+                changed = true;
+                iter.remove();
+            }
         }
         return changed;
     }
@@ -261,6 +268,31 @@ public class LinkedList<T> implements List<T> {
         return index;
     }
 
+    /**
+     * Returns the node at the given index of the list.
+     */
+    Node getNodeAt(int index) {
+        if (head == null) {
+            throw new IndexOutOfBoundsException(
+                    String.format("Cannot get node #%d in empty list", index));
+        }
+
+        Node current = head;
+        int i = 0;
+        while (i < index) {
+            current = current.getNext();
+            if (current == null) {
+                throw new IndexOutOfBoundsException(
+                        String.format("Cannot get node #%d in list of size %d", index, i));
+            }
+            i++;
+        }
+        return current;
+    }
+
+    /**
+     * Returns the last node in the list.
+     */
     Node getLastNode() {
         if (head == null) {
             return null;
@@ -292,6 +324,7 @@ public class LinkedList<T> implements List<T> {
         }
         java.util.ListIterator<T> iter = listIterator(fromIndex);
         LinkedList<T> sublist = new LinkedList<T>();
+        sublist.head = getNodeAt(fromIndex);
         while (iter.nextIndex() < toIndex) {
             if (!iter.hasNext()) {
                 throw new IndexOutOfBoundsException();
@@ -309,7 +342,7 @@ public class LinkedList<T> implements List<T> {
     @Override
     public int size() {
         java.util.ListIterator<T> iter = listIterator();
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             iter.next();
         }
         return iter.nextIndex();
@@ -367,6 +400,15 @@ public class LinkedList<T> implements List<T> {
     }
 
     @Override
+    public int hashCode() {
+        int hashCode = 1;
+        for (T value : this) {
+            hashCode = 31 * hashCode + (value == null ? 0 : value.hashCode());
+        }
+        return hashCode;
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[");
         Iterator<T> iterator = iterator();
@@ -414,22 +456,16 @@ public class LinkedList<T> implements List<T> {
             if (next == null) {
                 throw new NoSuchElementException("No more elements in list");
             }
-            T value = next.getValue();
-
-            // In case current was removed.
-            if (current != null) {
-                previous = current;
-            }
-            current = next;
+            previous = current = next;
             next = next.getNext();
             nextIndex++;
             previousIndex++;
-            return value;
+            return current.getValue();
         }
 
         @Override
         public boolean hasPrevious() {
-            return current != null || previous != null;
+            return previous != null;
         }
 
         @Override
@@ -437,7 +473,13 @@ public class LinkedList<T> implements List<T> {
             if (previous == null) {
                 throw new NoSuchElementException("No previous element");
             }
-            return previous.getValue();
+            current = next = previous;
+
+            previousIndex--;
+            nextIndex--;
+
+            previous = previousIndex >= 0 ? getNodeAt(previousIndex) : null;
+            return current.getValue();
         }
 
         @Override
@@ -453,22 +495,35 @@ public class LinkedList<T> implements List<T> {
         @Override
         public void remove() {
             if (current == null) {
-                throw new IllegalStateException("Cannot remove before next or twice in a row");
+                throw new IllegalStateException("Cannot remove twice without iterating");
             }
             if (current == head) {
-                head = next;
+                head = current.getNext();
+            }
+            // Following a previous().
+            if (current == next) {
+                next = next.getNext();
+                if (previous != null) {
+                    previous.setNext(next);
+                }
+            } else {
+                // Following a next().
+                previousIndex--;
+                nextIndex--;
+                if (previousIndex == -1) {
+                    previous = null;
+                } else {
+                    previous = getNodeAt(previousIndex);
+                    previous.setNext(next);
+                }
             }
             current = null;
-            if (previous != null) {
-                previous.setNext(next);
-            }
-            nextIndex--;
         }
 
         @Override
         public void set(T t) {
             if (current == null) {
-                throw new IllegalStateException("Cannot set after remove");
+                throw new IllegalStateException("Cannot set after add or remove");
             }
             current.setValue(t);
         }
@@ -476,17 +531,15 @@ public class LinkedList<T> implements List<T> {
         @Override
         public void add(T t) {
             Node newNode = new Node(t);
-            if (current != null) {
-                current.setNext(newNode);
+            if (previous != null) {
+                previous.setNext(newNode);
             }
-            if (next != null) {
-                newNode.setNext(next);
-            }
+            newNode.setNext(next);
             if (next == head) {
                 head = newNode;
             }
-            previous = current;
-            current = newNode;
+            previous = newNode;
+            current = null;
             previousIndex++;
             nextIndex++;
         }
