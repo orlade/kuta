@@ -317,6 +317,7 @@ public class LinkedList<T> implements List<T> {
         return new ListIterator(index);
     }
 
+    // TODO: Implement properly with view subclass backed by this list.
     @Override
     public java.util.List<T> subList(int fromIndex, int toIndex) {
         if (fromIndex < 0 || fromIndex > toIndex) {
