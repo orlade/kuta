@@ -5,7 +5,7 @@ package net.piemaster.kuta.algorithms.search;
  *
  * @param <T> The comparable type of the elements in the arrays.
  */
-public class BinarySearcher<T extends Comparable> {
+public class BinarySearcher<T extends Comparable> implements Searcher<T, T[]> {
 
     /**
      * Performs a binary search for a target in a subset of an array, bounded by upper and lower
@@ -18,12 +18,8 @@ public class BinarySearcher<T extends Comparable> {
      * @return The index of the target element in the array, or -1 if it does not exist.
      */
     int search(T[] array, T target, int lower, int upper) {
-        if (array == null || array.length == 0) {
-            return -1;
-        } else if (lower < 0 || upper > array.length) {
+        if (lower < 0 || upper > array.length) {
             throw new IllegalArgumentException("Bounds must be within array");
-        } else if (target == null) {
-            throw new IllegalArgumentException("Target must not be null");
         }
 
         // TODO: Handle possible overflow from addition.
@@ -52,9 +48,12 @@ public class BinarySearcher<T extends Comparable> {
      * @return The index of the target element in the array, or -1 if it does not exist.
      */
     public int search(T[] array, T target) {
-        if (array == null) {
+        if (array == null || array.length == 0) {
             return -1;
+        } else if (target == null) {
+            throw new IllegalArgumentException("Target must not be null");
         }
+
         return search(array, target, 0, array.length);
     }
 
