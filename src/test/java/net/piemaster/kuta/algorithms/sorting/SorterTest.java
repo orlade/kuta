@@ -6,9 +6,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 
 /**
  * Abstract tests for Sorter classes.
@@ -68,6 +70,29 @@ public abstract class SorterTest {
         Integer[] items = EMPTY_ARRAY.clone();
         sorter.sort(items);
         assertThat(items).isEqualTo(EMPTY_ARRAY);
+    }
+
+    @Test
+    public void testSortArray_random() {
+        // One more than a perfect square to hit some edge cases.
+        final int size = 65;
+        Integer[] items = new Integer[size];
+        for (int i = 0; i < size; i++) {
+            // Choose a random number from MIN_INT to MAX_INT.
+            double value = (Math.random() - 0.5) * 2 * Integer.MAX_VALUE;
+            items[i] = Integer.valueOf("" + Math.round(value));
+        }
+        sorter.sort(items);
+
+        int numWrong = 0;
+        // Each element should be equal to or greater than the element before it.
+        for (int i = 1; i < items.length; i++) {
+            if (items[i].compareTo(items[i - 1]) < 0) {
+                numWrong++;
+            }
+        }
+        assertWithMessage("Output should be sorted, but %s elements are out of order", numWrong)
+                .that(numWrong).isEqualTo(0);
     }
 
 
