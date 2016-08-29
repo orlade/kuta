@@ -4,7 +4,7 @@ public class InsertionSorterTest extends SorterTest {
 
     @Override
     protected Sorter<Integer> buildSorter() {
-        return new InsertionSorter<Integer>();
+        return new InsertionSorter<>();
     }
 
 }

@@ -1,10 +1,10 @@
 package net.piemaster.kuta.algorithms.sorting;
 
-public class SelectionSorterTest extends SorterTest {
+public class BottomUpMergeSorterTest extends SorterTest {
 
     @Override
     protected Sorter<Integer> buildSorter() {
-        return new SelectionSorter<>();
+        return new BottomUpMergeSorter<>();
     }
 
 }
