@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -27,10 +27,10 @@ public abstract class SorterTest {
     protected static final Integer[] MULTIPLE_ARRAY_SORTED = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
     // Input collections
-    protected static final Collection<Integer> EMPTY_COLL = ImmutableList.of();
-    protected static final Collection<Integer> SINGLE_COLL = ImmutableList.of(1);
-    protected static final Collection<Integer> MULTIPLE_COLL = ImmutableList.of(5, 2, 4, 1, 3, 10, 9, 8, 7, 6);
-    protected static final Collection<Integer> MULTIPLE_COLL_SORTED = ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    protected static final List<Integer> EMPTY_COLL = ImmutableList.of();
+    protected static final List<Integer> SINGLE_COLL = ImmutableList.of(1);
+    protected static final List<Integer> MULTIPLE_COLL = ImmutableList.of(5, 2, 4, 1, 3, 10, 9, 8, 7, 6);
+    protected static final List<Integer> MULTIPLE_COLL_SORTED = ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
     /**
      * Abstract method to build a Sorter of a specific type to test.
@@ -72,22 +72,22 @@ public abstract class SorterTest {
 
 
     @Test
-    public void testSortCollection_single() {
-        Collection<Integer> items = new ArrayList<>(SINGLE_COLL);
+    public void testSortList_single() {
+        List<Integer> items = new ArrayList<>(SINGLE_COLL);
         sorter.sort(items);
         assertThat(items).isEqualTo(SINGLE_COLL);
     }
 
     @Test
-    public void testSortCollection_multiple() {
-        Collection<Integer> items = new ArrayList<>(MULTIPLE_COLL);
+    public void testSortList_multiple() {
+        List<Integer> items = new ArrayList<>(MULTIPLE_COLL);
         sorter.sort(items);
         assertThat(items).isEqualTo(MULTIPLE_COLL_SORTED);
     }
 
     @Test
-    public void testSortCollection_empty() {
-        Collection<Integer> items = new ArrayList<>(EMPTY_COLL);
+    public void testSortList_empty() {
+        List<Integer> items = new ArrayList<>(EMPTY_COLL);
         sorter.sort(items);
         assertThat(items).isEqualTo(EMPTY_COLL);
     }
